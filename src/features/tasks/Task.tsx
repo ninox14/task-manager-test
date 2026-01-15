@@ -23,6 +23,9 @@ export function Task({ task }: Props) {
   async function handleTaskToggle() {
     try {
       await toggleTask(task.id).unwrap();
+      toast.success('Successfully Updated task', {
+        autoClose: 2000,
+      });
     } catch (err) {
       toast.error('Something went wrong while toggling task');
     }
@@ -31,6 +34,7 @@ export function Task({ task }: Props) {
   async function handleDeleteTask() {
     try {
       await deleteTask(task.id).unwrap();
+      toast.success('Successfully Deleted task', { autoClose: 2000 });
     } catch (err) {
       toast.error('Something went wrong while deleting task');
     }
@@ -78,7 +82,7 @@ export function Task({ task }: Props) {
         </div>
       )}
       {isLoading && (
-        <div className=" z-10 absolute rounded-md pointer-events-none bg-gray-500/50 inset-0 flex justify-center items-center w-full h-full">
+        <div className="z-10 absolute rounded-md pointer-events-none bg-gray-500/50 inset-0 flex justify-center items-center w-full h-full">
           <Spinner />
         </div>
       )}

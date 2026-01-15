@@ -1,6 +1,6 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApi, retry } from '@reduxjs/toolkit/query/react';
 import type { Task } from '@/features/tasks/types';
-import { mockedBaseQuery } from '@/mock/api';
+import { mockedBaseQuery, type MockedBaseQuertArgs } from '@/mock/api';
 
 export interface ApiSuccessResponse<T> {
   meta?: {
@@ -21,9 +21,29 @@ export type Filter = 'all' | 'active' | 'completed';
 
 export type CreateTaskDto = Omit<Task, 'id' | 'createdAt' | 'completed'>;
 
+const staggeredBaseQueryWithBailOut = retry(
+  async (args: MockedBaseQuertArgs, api, extraOptions) => {
+    const result = await mockedBaseQuery(args, api, extraOptions);
+
+    // bail out of re-tries immediately if unauthorized,
+    // because we know successive re-retries would be redundant
+    if (result.error?.statusCode === 400) {
+      retry.fail(result.error, result.meta);
+    }
+    if (result.error?.statusCode === 404) {
+      retry.fail(result.error, result.meta);
+    }
+
+    return result;
+  },
+  {
+    maxRetries: 3,
+  }
+);
+
 export const tasksService = createApi({
   reducerPath: 'tasksService',
-  baseQuery: mockedBaseQuery,
+  baseQuery: staggeredBaseQueryWithBailOut,
   tagTypes: ['Task'],
   endpoints: (builder) => ({
     // GET /tasks
@@ -56,6 +76,7 @@ export const tasksService = createApi({
         body,
       }),
       invalidatesTags: [{ type: 'Task', id: 'LIST' }],
+      extraOptions: { maxRetries: 0 },
     }),
 
     // PUT /tasks/:id
@@ -68,6 +89,7 @@ export const tasksService = createApi({
         method: 'PUT',
         body: patch,
       }),
+      extraOptions: { maxRetries: 0 },
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Task', id }],
     }),
 
@@ -77,6 +99,7 @@ export const tasksService = createApi({
         url: `/tasks/${id}`,
         method: 'DELETE',
       }),
+      extraOptions: { maxRetries: 0 },
       invalidatesTags: (_result, _error, id) => [{ type: 'Task', id }],
     }),
 
