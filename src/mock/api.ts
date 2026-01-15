@@ -17,20 +17,21 @@ import type {
   SortBy,
 } from '@/features/tasks/taskService';
 
+export type MockedBaseQuertArgs = {
+  url: string;
+  method: string;
+  body?: Partial<Task>;
+  params?: {
+    page?: number;
+    limit?: number;
+    filter?: Filter;
+    sortBy?: SortBy;
+    search?: string;
+  };
+};
 export const mockedBaseQuery: BaseQueryFn<
-  {
-    url: string;
-    method: string;
-    body?: Partial<Task>;
-    params?: {
-      page?: number;
-      limit?: number;
-      filter?: Filter;
-      sortBy?: SortBy;
-      search?: string;
-    };
-  },
-  ApiSuccessResponse<any>,
+  MockedBaseQuertArgs,
+  ApiSuccessResponse<unknown>,
   ApiErrorResponse
 > = async ({ url, method, body, params }) => {
   try {
@@ -106,6 +107,7 @@ export const mockedBaseQuery: BaseQueryFn<
       return { data: { data: null } };
     }
   } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const error = err as any;
     console.log('Returning error, cause: ', err);
     if (error?.status && error?.data) {
