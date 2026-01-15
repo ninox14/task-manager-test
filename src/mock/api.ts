@@ -8,9 +8,9 @@ import {
   saveTasks,
   createApiError,
 } from './utils';
-import { type Task } from '@/feature/tasks/types';
+import { type Task } from '@/features/tasks/types';
 import { nanoid } from '@reduxjs/toolkit';
-import type { Filter, SortBy } from '@/feature/tasks/taskService';
+import type { Filter, SortBy } from '@/features/tasks/taskService';
 
 export const mockedBaseQuery: BaseQueryFn<
   {
