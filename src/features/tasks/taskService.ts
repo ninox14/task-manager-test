@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import type { Task } from '@/feature/tasks/types';
+import type { Task } from '@/features/tasks/types';
 import { mockedBaseQuery } from '@/mock/api';
 
 export interface ApiSuccessResponse<T> {

@@ -1,11 +1,11 @@
 import { MOCK_CONFIG } from './config';
 
-import { type Task } from '@/feature/tasks/types';
+import { type Task } from '@/features/tasks/types';
 import type {
   ApiErrorResponse,
   Filter,
   SortBy,
-} from '@/feature/tasks/taskService';
+} from '@/features/tasks/taskService';
 
 const TASKS_KEY = 'tasks';
 
