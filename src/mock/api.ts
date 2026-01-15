@@ -10,7 +10,12 @@ import {
 } from './utils';
 import { type Task } from '@/features/tasks/types';
 import { nanoid } from '@reduxjs/toolkit';
-import type { Filter, SortBy } from '@/features/tasks/taskService';
+import type {
+  ApiErrorResponse,
+  ApiSuccessResponse,
+  Filter,
+  SortBy,
+} from '@/features/tasks/taskService';
 
 export const mockedBaseQuery: BaseQueryFn<
   {
@@ -25,8 +30,8 @@ export const mockedBaseQuery: BaseQueryFn<
       search?: string;
     };
   },
-  unknown,
-  unknown
+  ApiSuccessResponse<any>,
+  ApiErrorResponse
 > = async ({ url, method, body, params }) => {
   try {
     await delay();
@@ -86,11 +91,11 @@ export const mockedBaseQuery: BaseQueryFn<
     // PATCH /api/tasks/:id/toggle
     if (url.match(/^\/tasks\/.+\/toggle$/)) {
       const id = url.split('/')[2];
-      console.log('patching: ', id);
       tasks = tasks.map((t) =>
         t.id === id ? { ...t, completed: !t.completed } : t
       );
       saveTasks(tasks);
+      console.log('Patched successfully', id);
       return { data: { data: tasks.find((t) => t.id === id)! } };
     }
 
@@ -100,11 +105,11 @@ export const mockedBaseQuery: BaseQueryFn<
       saveTasks(tasks.filter((t) => t.id !== id));
       return { data: { data: null } };
     }
-  } catch (err: unknown) {
-    // FIXME:
-    //@ts-expect-error FIXME
-    if (err?.status && err?.data) {
-      return { error: err };
+  } catch (err) {
+    const error = err as any;
+    console.log('Returning error, cause: ', err);
+    if (error?.status && error?.data) {
+      return { error: error };
     }
 
     return {
@@ -118,6 +123,7 @@ export const mockedBaseQuery: BaseQueryFn<
       },
     };
   }
+  console.log('returning 404');
   return {
     error: {
       status: 404,
