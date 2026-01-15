@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import {
@@ -33,12 +34,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  useCreateTaskMutation,
+  type ApiErrorResponse,
+  type CreateTaskDto,
+} from './taskService';
+import { Spinner } from '@/components/ui/spinner';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { format } from 'date-fns';
-import { Textarea } from '@/components/ui/textarea';
+import { format, formatISO } from 'date-fns';
+import { toast } from 'react-toastify';
 
-import { useState } from 'react';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 const priorities = [
   { label: 'Low', value: 'low' },
@@ -68,6 +76,8 @@ const formSchema = yup
 export function TaskModal({ task }: Props) {
   const [open, setOpen] = useState(false);
 
+  const [createTask, { isLoading }] = useCreateTaskMutation();
+
   const form = useForm({
     resolver: yupResolver(formSchema),
     defaultValues: {
@@ -79,6 +89,27 @@ export function TaskModal({ task }: Props) {
 
   async function onSubmit(data: yup.InferType<typeof formSchema>) {
     console.log(data, 'submitted');
+    const task: CreateTaskDto = {
+      title: data.title,
+      description: data.description,
+      priority: data.priority,
+      dueDate: data.dueDate ? formatISO(data.dueDate) : undefined,
+    };
+    try {
+      await createTask(task).unwrap();
+      toast.success('Task Created successfully');
+      setOpen(false);
+    } catch (err) {
+      const error = err as {
+        error: FetchBaseQueryError;
+        data?: ApiErrorResponse;
+      };
+      let msg;
+      if (error?.data) {
+        msg = error.data?.message;
+      }
+      toast.error(`Error while submitting task${msg ? `: ${msg}` : ''}`);
+    }
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -222,7 +253,8 @@ export function TaskModal({ task }: Props) {
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button type="submit" form="task-form">
+          <Button type="submit" form="task-form" disabled={isLoading}>
+            {isLoading && <Spinner />}
             Submit
           </Button>
         </DialogFooter>
