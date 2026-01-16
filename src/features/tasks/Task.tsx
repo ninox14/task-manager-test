@@ -1,4 +1,4 @@
-import { Trash2Icon } from 'lucide-react';
+import { Pencil, Trash2Icon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -12,9 +12,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { twMerge } from 'tailwind-merge';
 import { Button } from '@/components/ui/button';
 
-type Props = { task: Task };
+type Props = { task: Task; selectTask: (task: Task) => void };
 
-export function Task({ task }: Props) {
+export function Task({ task, selectTask }: Props) {
   const createdAt = format(parseJSON(task.createdAt), 'dd-MM-yyyy');
   const [toggleTask, { isLoading: isUpdating }] = useToggleTaskMutation();
 
@@ -61,6 +61,9 @@ export function Task({ task }: Props) {
             {task.title}
           </h4>
         </Label>
+        <Button size="icon" onClick={() => selectTask(task)}>
+          <Pencil />
+        </Button>
         <Button variant="destructive" size="icon" onClick={handleDeleteTask}>
           <Trash2Icon />
         </Button>
