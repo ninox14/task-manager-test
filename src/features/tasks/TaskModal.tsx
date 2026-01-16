@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import {
@@ -37,16 +36,18 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   useCreateTaskMutation,
+  useUpdateTaskMutation,
   type ApiErrorResponse,
   type CreateTaskDto,
 } from './taskService';
 import { Spinner } from '@/components/ui/spinner';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { format, formatISO } from 'date-fns';
+import { format, formatISO, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { useEffect } from 'react';
 
 const priorities = [
   { label: 'Low', value: 'low' },
@@ -54,9 +55,6 @@ const priorities = [
   { label: 'High', value: 'high' },
 ] as const;
 
-type Props = {
-  task?: Task;
-};
 const formSchema = yup
   .object({
     title: yup.string().min(5).max(200).required(),
@@ -73,32 +71,56 @@ const formSchema = yup
   })
   .required();
 
-export function TaskModal({ task }: Props) {
-  const [open, setOpen] = useState(false);
+type Props = {
+  task?: Task;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+};
 
-  const [createTask, { isLoading }] = useCreateTaskMutation();
+export function TaskModal({ task, open, setOpen }: Props) {
+  const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
   const form = useForm({
     resolver: yupResolver(formSchema),
+    // Should be returned by the function but resolver package is bugged
+    // https://github.com/react-hook-form/resolvers/issues/807
+    // and all form types break
     defaultValues: {
       title: '',
-      // @ts-expect-error fixing warning in runtime
+      // @ts-expect-error fixing warning in runtime and preserve correct UX
       priority: '',
     },
   });
-
+  function handleDialogOpenChange(open: boolean) {
+    // Clearing form when dialog closes
+    if (!open) {
+      // @ts-expect-error fixing warning in runtime
+      form.reset({
+        description: '',
+        title: '',
+        dueDate: undefined,
+        priority: '',
+      });
+    }
+    setOpen(open);
+  }
   async function onSubmit(data: yup.InferType<typeof formSchema>) {
-    console.log(data, 'submitted');
-    const task: CreateTaskDto = {
+    const newTask: CreateTaskDto = {
       title: data.title,
       description: data.description,
       priority: data.priority,
       dueDate: data.dueDate ? formatISO(data.dueDate) : undefined,
     };
+
     try {
-      await createTask(task).unwrap();
-      toast.success('Task Created successfully');
-      setOpen(false);
+      if (task) {
+        await updateTask({ ...newTask, id: task.id }).unwrap();
+      } else {
+        await createTask(newTask).unwrap();
+      }
+      toast.success(`Task ${!task ? 'Created' : 'Updated'} successfully`);
+      handleDialogOpenChange(false);
     } catch (err) {
       const error = err as {
         error: FetchBaseQueryError;
@@ -111,18 +133,30 @@ export function TaskModal({ task }: Props) {
       toast.error(`Error while submitting task${msg ? `: ${msg}` : ''}`);
     }
   }
+  useEffect(() => {
+    if (!task) return;
+    form.reset({
+      title: task?.title,
+      priority: task?.priority,
+      dueDate: task?.dueDate ? parseISO(task.dueDate) : undefined,
+      description: task?.description ?? '',
+    });
+  }, [task]);
+
+  const dialogMode = !task ? 'Create' : 'Edit';
+  const isLoading = isUpdating || isCreating;
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" onClick={() => setOpen(!open)}>
-          {!task ? 'Create Task' : 'Edit'}
+          Create Task
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>{!task ? 'Create Task' : 'Edit'}</DialogTitle>
+          <DialogTitle>{dialogMode} Task</DialogTitle>
           <DialogDescription>
-            {!task ? 'Create' : 'Edit'} your beautiful task
+            {dialogMode} your beautiful task
           </DialogDescription>
         </DialogHeader>
         <form id="task-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -255,7 +289,7 @@ export function TaskModal({ task }: Props) {
           </DialogClose>
           <Button type="submit" form="task-form" disabled={isLoading}>
             {isLoading && <Spinner />}
-            Submit
+            {!task ? 'Create' : 'Update'}
           </Button>
         </DialogFooter>
       </DialogContent>
