@@ -24,7 +24,7 @@ export type MockedBaseQuertArgs = {
   params?: {
     page?: number;
     limit?: number;
-    filter?: CompletionFilter;
+    completion?: CompletionFilter;
     sortBy?: SortBy;
     search?: string;
   };
@@ -45,12 +45,15 @@ export const mockedBaseQuery: BaseQueryFn<
       const {
         page = 1,
         limit = 10,
-        filter = 'all',
+        completion = 'all',
         search = '',
         sortBy = 'date',
       } = params || {};
-
-      const filtered = sortTasks(filterTasks(tasks, filter, search), sortBy);
+      console.log();
+      const filtered = sortTasks(
+        filterTasks(tasks, completion, search),
+        sortBy,
+      );
 
       const start = (page - 1) * limit;
       const paged = filtered.slice(start, start + limit);
@@ -93,7 +96,7 @@ export const mockedBaseQuery: BaseQueryFn<
     if (url.match(/^\/tasks\/.+\/toggle$/)) {
       const id = url.split('/')[2];
       tasks = tasks.map((t) =>
-        t.id === id ? { ...t, completed: !t.completed } : t
+        t.id === id ? { ...t, completed: !t.completed } : t,
       );
       saveTasks(tasks);
       console.log('Patched successfully', id);
@@ -120,7 +123,7 @@ export const mockedBaseQuery: BaseQueryFn<
         data: createApiError(
           500,
           'Internal Server Error',
-          'Unknown mock server error'
+          'Unknown mock server error',
         ),
       },
     };

@@ -95,11 +95,11 @@ export function TaskModal({ task, open, setOpen }: Props) {
   function handleDialogOpenChange(open: boolean) {
     // Clearing form when dialog closes
     if (!open) {
-      // @ts-expect-error fixing warning in runtime
+      // @ts-expect-error fixing warning in runtime and preserve correct UX
       form.reset({
         description: '',
         title: '',
-        dueDate: undefined,
+        dueDate: null,
         priority: '',
       });
     }
@@ -148,7 +148,11 @@ export function TaskModal({ task, open, setOpen }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={() => setOpen(!open)}>
+        <Button
+          variant="outline"
+          className="max-w-fit"
+          onClick={() => setOpen(!open)}
+        >
           Create Task
         </Button>
       </DialogTrigger>

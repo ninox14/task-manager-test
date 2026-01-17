@@ -18,7 +18,13 @@ export interface ApiErrorResponse {
 
 export type SortBy = 'date' | 'priority' | 'title';
 export type CompletionFilter = 'all' | 'active' | 'completed';
-
+type Params = {
+  page?: number;
+  limit?: number;
+  completion?: CompletionFilter;
+  sortBy?: SortBy;
+  search?: string;
+};
 export type CreateTaskDto = Omit<Task, 'id' | 'createdAt' | 'completed'>;
 
 const staggeredBaseQueryWithBailOut = retry(
@@ -38,7 +44,7 @@ const staggeredBaseQueryWithBailOut = retry(
   },
   {
     maxRetries: 3,
-  }
+  },
 );
 
 export const tasksService = createApi({
@@ -47,20 +53,21 @@ export const tasksService = createApi({
   tagTypes: ['Task'],
   endpoints: (builder) => ({
     // GET /tasks
-    getTasks: builder.query<
-      ApiSuccessResponse<Task[]>,
-      {
-        page?: number;
-        limit?: number;
-        sortBy?: SortBy;
-        filter?: CompletionFilter;
-      }
-    >({
-      query: ({ page = 1, limit = 10 } = {}) => ({
-        url: '/tasks',
-        params: { page, limit },
-        method: 'GET',
-      }),
+    getTasks: builder.query<ApiSuccessResponse<Task[]>, Params>({
+      query: (values) => {
+        const {
+          page = 1,
+          limit = 10,
+          completion = 'all',
+          search = '',
+          sortBy = 'date',
+        } = values;
+        return {
+          url: '/tasks',
+          params: { page, limit, search, completion, sortBy },
+          method: 'GET',
+        };
+      },
       providesTags: (result) =>
         result?.data
           ? [
