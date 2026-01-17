@@ -17,7 +17,7 @@ export interface ApiErrorResponse {
 }
 
 export type SortBy = 'date' | 'priority' | 'title';
-export type Filter = 'all' | 'active' | 'completed';
+export type CompletionFilter = 'all' | 'active' | 'completed';
 
 export type CreateTaskDto = Omit<Task, 'id' | 'createdAt' | 'completed'>;
 
@@ -49,7 +49,12 @@ export const tasksService = createApi({
     // GET /tasks
     getTasks: builder.query<
       ApiSuccessResponse<Task[]>,
-      { page?: number; limit?: number; sortBy?: SortBy; filter?: Filter }
+      {
+        page?: number;
+        limit?: number;
+        sortBy?: SortBy;
+        filter?: CompletionFilter;
+      }
     >({
       query: ({ page = 1, limit = 10 } = {}) => ({
         url: '/tasks',

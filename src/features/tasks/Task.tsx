@@ -26,7 +26,7 @@ export function Task({ task, selectTask }: Props) {
       toast.success('Successfully Updated task', {
         autoClose: 2000,
       });
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong while toggling task');
     }
   }
@@ -35,7 +35,7 @@ export function Task({ task, selectTask }: Props) {
     try {
       await deleteTask(task.id).unwrap();
       toast.success('Successfully Deleted task', { autoClose: 2000 });
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong while deleting task');
     }
   }
