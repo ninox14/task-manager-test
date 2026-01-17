@@ -3,11 +3,14 @@ import { Task } from '@/features/tasks/Task';
 import { TaskModal } from '@/features/tasks/TaskModal';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
+import type { Task as TaskType } from '@/features/tasks/types';
+import { TaskFilters, type Filters } from '@/features/tasks/TaskFilters';
 import { useGetTasksQuery } from '@/features/tasks/taskService';
 import { toast } from 'react-toastify';
-import type { Task as TaskType } from '@/features/tasks/types';
-import { TaskFilters, type Filters } from './features/tasks/TaskFilters';
-import { useDebounce } from './hooks/useDebounce';
+import { useDebounce } from '@/hooks/useDebounce';
+import { Pagination } from '@/components/Pagination';
+
+const MAX_ITEMS_PER_PAGE = 10;
 
 function App() {
   const [task, setTask] = useState<TaskType | undefined>();
@@ -17,12 +20,14 @@ function App() {
     search: '',
     sortBy: 'date',
   });
-  const debouncedSearch = useDebounce(filters.search, 300);
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounce(filters.search, 500);
   const { data, isLoading, isFetching, error, isError } = useGetTasksQuery(
     {
       completion: filters.completion,
       search: debouncedSearch.length > 2 ? debouncedSearch : '',
       sortBy: filters.sortBy,
+      page,
     },
     {
       refetchOnMountOrArgChange: true,
@@ -31,7 +36,6 @@ function App() {
   function handleTaskModalOpen(open: boolean) {
     // Deselect task when edit modal closes
     if (!open && task) {
-      console.log('clear');
       setTask(undefined);
     }
     setTaskModalOpen(open);
@@ -44,11 +48,20 @@ function App() {
 
   useEffect(() => {
     if (isError && error) {
+      if (data?.meta?.page && data?.meta?.page !== page) {
+        setPage(data.meta.page);
+      }
       toast.error(
         `Something went wrong while fetching tasks ${error.message ?? ''}`,
       );
     }
-  }, [isError, error]);
+  }, [isError, error, data?.meta?.page]);
+  // Edge case when search has less page than currently selected
+  useEffect(() => {
+    if (filters.search) {
+      setPage(1);
+    }
+  }, [filters.search]);
 
   const isUpdating = isLoading || isFetching;
   return (
@@ -66,10 +79,19 @@ function App() {
         </div>
       </div>
       <Separator className="mt-3" />
-      <div className="flex flex-col items-center space-y-2 w-full mt-3">
+      <div className="flex flex-col items-center space-y-2 w-full my-3">
         {data?.data.map((item) => (
           <Task key={item.id} task={item} selectTask={handleSelectTask} />
         ))}
+      </div>
+      <Separator />
+      <div className="flex mt-2 justify-center ">
+        <Pagination
+          total={data?.meta?.total ?? 0}
+          page={page}
+          limit={data?.meta?.limit ?? MAX_ITEMS_PER_PAGE}
+          setPage={setPage}
+        />
       </div>
     </div>
   );
