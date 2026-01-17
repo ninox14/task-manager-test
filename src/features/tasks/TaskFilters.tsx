@@ -32,7 +32,7 @@ export function TaskFilters({ filters, setFilters }: Props) {
     setFilters({ ...filters, sortBy });
   }
   return (
-    <div className="flex gap-1.5  ">
+    <div className="flex justify-center gap-1.5 flex-wrap sm:flex-nowrap ">
       {/* Select element is not decomposed here
         cause of relative small size of components, same with options
         othervise should be decomposed and options generated */}

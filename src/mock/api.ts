@@ -49,12 +49,11 @@ export const mockedBaseQuery: BaseQueryFn<
         search = '',
         sortBy = 'date',
       } = params || {};
-      console.log();
       const filtered = sortTasks(
         filterTasks(tasks, completion, search),
         sortBy,
       );
-
+      // const relevantPage = search.length > 0
       const start = (page - 1) * limit;
       const paged = filtered.slice(start, start + limit);
 

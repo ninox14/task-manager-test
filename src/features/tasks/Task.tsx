@@ -9,8 +9,8 @@ import {
 import type { Task } from '@/features/tasks/types';
 import { format, parseJSON } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
-import { twMerge } from 'tailwind-merge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type Props = { task: Task; selectTask: (task: Task) => void };
 
@@ -44,9 +44,9 @@ export function Task({ task, selectTask }: Props) {
 
   return (
     <div
-      className={twMerge(
+      className={cn(
         'flex relative z-0 max-w-200 w-full flex-col border border-stone-800 p-3 space-y-0.5 rounded-md',
-        isLoading && 'pointer-events-none'
+        isLoading && 'pointer-events-none',
       )}
     >
       <div className="flex justify-between items-center gap-2">

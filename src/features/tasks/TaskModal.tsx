@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, PlusIcon } from 'lucide-react';
 import {
   Dialog,
   DialogClose,
@@ -67,6 +67,9 @@ const formSchema = yup
     dueDate: yup
       .date()
       .min(new Date(), 'You cannot set past dates!')
+      .transform((value, originalValue) => {
+        return originalValue === null ? undefined : value;
+      })
       .optional(),
   })
   .required();
@@ -148,11 +151,8 @@ export function TaskModal({ task, open, setOpen }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="max-w-fit"
-          onClick={() => setOpen(!open)}
-        >
+        <Button variant="outline" className="max-w-fit">
+          <PlusIcon />
           Create Task
         </Button>
       </DialogTrigger>
@@ -195,7 +195,7 @@ export function TaskModal({ task, open, setOpen }: Props) {
                     id="description"
                     placeholder="Detailed Task description"
                     rows={6}
-                    className="min-h-24 resize-none"
+                    className="min-h-24 max-h-[10svh] resize-none"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
