@@ -109,9 +109,9 @@ export const mockedBaseQuery: BaseQueryFn<
       return { data: { data: null } };
     }
   } catch (err) {
+    // FIXME: redundant ?
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const error = err as any;
-    console.log('Returning error, cause: ', err);
     if (error?.status && error?.data) {
       return { error: error };
     }
@@ -127,7 +127,6 @@ export const mockedBaseQuery: BaseQueryFn<
       },
     };
   }
-  console.log('returning 404');
   return {
     error: {
       status: 404,
