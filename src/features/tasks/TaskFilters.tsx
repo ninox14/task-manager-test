@@ -54,7 +54,9 @@ export function TaskFilters({ filters, setFilters }: Props) {
         </SelectContent>
       </Select>
       <Input
+        name="search"
         value={filters.search}
+        className="max-w-80"
         placeholder="Search ..."
         onChange={handleSearchChange}
       />
