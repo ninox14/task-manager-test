@@ -13,7 +13,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import type {
   ApiErrorResponse,
   ApiSuccessResponse,
-  Filter,
+  CompletionFilter,
   SortBy,
 } from '@/features/tasks/taskService';
 
@@ -24,7 +24,7 @@ export type MockedBaseQuertArgs = {
   params?: {
     page?: number;
     limit?: number;
-    filter?: Filter;
+    filter?: CompletionFilter;
     sortBy?: SortBy;
     search?: string;
   };

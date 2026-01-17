@@ -6,10 +6,12 @@ import { Separator } from '@/components/ui/separator';
 import { useGetTasksQuery } from '@/features/tasks/taskService';
 import { toast } from 'react-toastify';
 import type { Task as TaskType } from '@/features/tasks/types';
+import { TaskFilters, type Filters } from './features/tasks/TaskFilters';
 
 function App() {
   const [task, setTask] = useState<TaskType | undefined>();
   const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [filters, setFilters] = useState<Filters>({ completion: 'all' });
   const { data, isLoading, isFetching, error, isError } = useGetTasksQuery(
     {},
     {
@@ -49,6 +51,7 @@ function App() {
           open={taskModalOpen}
           setOpen={handleTaskModalOpen}
         />
+        <TaskFilters setFilters={setFilters} filters={filters} />
         {isUpdating && <Spinner />}
       </div>
       <Separator className="mt-3" />

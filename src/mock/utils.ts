@@ -3,7 +3,7 @@ import { MOCK_CONFIG } from './config';
 import { type Task } from '@/features/tasks/types';
 import type {
   ApiErrorResponse,
-  Filter,
+  CompletionFilter,
   SortBy,
 } from '@/features/tasks/taskService';
 
@@ -53,7 +53,11 @@ export function createApiError(
   };
 }
 
-export function filterTasks(tasks: Task[], filter: Filter, search: string) {
+export function filterTasks(
+  tasks: Task[],
+  filter: CompletionFilter,
+  search: string
+) {
   return tasks.filter((t) => {
     if (filter === 'active' && t.completed) return false;
     if (filter === 'completed' && !t.completed) return false;
