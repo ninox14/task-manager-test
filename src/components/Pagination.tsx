@@ -93,7 +93,7 @@ export function Pagination({ limit, page, total, setPage }: Props) {
         <PaginationItem>
           <PaginationNext
             isActive={page < totalPages}
-            disabled={page === totalPages}
+            disabled={page === totalPages || !totalPages}
             onClick={handleNext}
           />
         </PaginationItem>

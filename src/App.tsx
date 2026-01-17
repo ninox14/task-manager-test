@@ -64,6 +64,7 @@ function App() {
   }, [filters.search]);
 
   const isUpdating = isLoading || isFetching;
+  const isEmpty = !data?.data?.length && !isUpdating;
   return (
     <div className="bg-gray-950 p-3 w-full min-h-svh flex flex-col items-center text-slate-300 ">
       <h1 className="font-bold text-4xl">TOdo</h1>
@@ -80,6 +81,11 @@ function App() {
       </div>
       <Separator className="mt-3" />
       <div className="flex flex-col items-center space-y-2 w-full my-3">
+        {isEmpty && (
+          <h3 className="font-bold">
+            No tasks {debouncedSearch.length > 0 && 'like this'} (๑˃̵ᴗ˂̵)/
+          </h3>
+        )}
         {data?.data.map((item) => (
           <Task key={item.id} task={item} selectTask={handleSelectTask} />
         ))}
