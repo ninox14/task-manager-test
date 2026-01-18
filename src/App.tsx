@@ -9,6 +9,9 @@ import { useGetTasksQuery } from '@/features/tasks/taskService';
 import { toast } from 'react-toastify';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Pagination } from '@/components/Pagination';
+import { TaskSkeleton } from '@/features/tasks/TaskSkeleton';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -22,17 +25,18 @@ function App() {
   });
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(filters.search, 500);
-  const { data, isLoading, isFetching, error, isError } = useGetTasksQuery(
-    {
-      completion: filters.completion,
-      search: debouncedSearch.length > 2 ? debouncedSearch : '',
-      sortBy: filters.sortBy,
-      page,
-    },
-    {
-      refetchOnMountOrArgChange: true,
-    },
-  );
+  const { data, isLoading, isFetching, error, isError, refetch } =
+    useGetTasksQuery(
+      {
+        completion: filters.completion,
+        search: debouncedSearch.length > 2 ? debouncedSearch : '',
+        sortBy: filters.sortBy,
+        page,
+      },
+      {
+        refetchOnMountOrArgChange: true,
+      },
+    );
   function handleTaskModalOpen(open: boolean) {
     // Deselect task when edit modal closes
     if (!open && task) {
@@ -69,23 +73,29 @@ function App() {
     <div className="bg-gray-950 p-3 w-full min-h-svh flex flex-col items-center text-slate-300 ">
       <h1 className="font-bold text-4xl">TOdo</h1>
       <div className="flex flex-col gap-1.5 items-center mt-4">
-        <TaskModal
-          task={task}
-          open={taskModalOpen}
-          setOpen={handleTaskModalOpen}
-        />
+        <div className="flex gap-2">
+          <TaskModal
+            task={task}
+            open={taskModalOpen}
+            setOpen={handleTaskModalOpen}
+          />
+          <Button size="icon" disabled={isUpdating} onClick={refetch}>
+            {isUpdating ? <Spinner /> : <RefreshCw />}
+          </Button>
+        </div>
         <div className="flex gap-1.5 items-center">
           <TaskFilters setFilters={setFilters} filters={filters} />
-          {isUpdating && <Spinner />}
         </div>
       </div>
       <Separator className="mt-3" />
-      <div className="flex flex-col items-center space-y-2 w-full my-3">
+      <div className="flex flex-col min-h-[calc(100svh-240px)] items-center space-y-2 w-full my-3">
         {isEmpty && (
           <h3 className="font-bold">
             No tasks {debouncedSearch.length > 0 && 'like this'} (๑˃̵ᴗ˂̵)/
           </h3>
         )}
+        {isLoading &&
+          Array.from({ length: 3 }).map((_, i) => <TaskSkeleton key={i} />)}
         {data?.data.map((item) => (
           <Task key={item.id} task={item} selectTask={handleSelectTask} />
         ))}
