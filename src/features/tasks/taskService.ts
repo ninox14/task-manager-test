@@ -18,7 +18,7 @@ export interface ApiErrorResponse {
 
 export type SortBy = 'date' | 'priority' | 'title';
 export type CompletionFilter = 'all' | 'active' | 'completed';
-type Params = {
+type GetTasksParams = {
   page?: number;
   limit?: number;
   completion?: CompletionFilter;
@@ -53,7 +53,7 @@ export const tasksService = createApi({
   tagTypes: ['Task'],
   endpoints: (builder) => ({
     // GET /tasks
-    getTasks: builder.query<ApiSuccessResponse<Task[]>, Params>({
+    getTasks: builder.query<ApiSuccessResponse<Task[]>, GetTasksParams>({
       query: (values) => {
         const {
           page = 1,
@@ -102,6 +102,22 @@ export const tasksService = createApi({
         body: patch,
       }),
       extraOptions: { maxRetries: 0 },
+      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
+        const patchResults = dispatch(
+          tasksService.util.updateQueryData('getTasks', {}, (draft) => {
+            const task = draft?.data?.find((t) => t.id === id);
+            if (task) {
+              Object.assign(task, patch);
+            }
+          }),
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResults.undo();
+        }
+      },
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Task', id }],
     }),
 
