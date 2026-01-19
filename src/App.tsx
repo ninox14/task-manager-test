@@ -35,7 +35,7 @@ function App() {
       },
       {
         refetchOnMountOrArgChange: true,
-      },
+      }
     );
   function handleTaskModalOpen(open: boolean) {
     // Deselect task when edit modal closes
@@ -52,17 +52,15 @@ function App() {
 
   useEffect(() => {
     if (isError && error) {
-      if (data?.meta?.page && data?.meta?.page !== page) {
-        setPage(data.meta.page);
-      }
       toast.error(
-        `Something went wrong while fetching tasks ${error.message ?? ''}`,
+        `Something went wrong while fetching tasks ${error.message ?? ''}`
       );
     }
-  }, [isError, error, data?.meta?.page]);
+  }, [isError, error]);
   // Edge case when search has less page than currently selected
   useEffect(() => {
-    if (filters.search) {
+    if (filters.search.trim()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPage(1);
     }
   }, [filters.search]);
@@ -103,7 +101,7 @@ function App() {
       <div className="flex mt-2 justify-center ">
         <Pagination
           total={data?.meta?.total ?? 0}
-          page={page}
+          page={data?.meta?.page ?? page}
           limit={data?.meta?.limit ?? MAX_ITEMS_PER_PAGE}
           setPage={setPage}
         />
