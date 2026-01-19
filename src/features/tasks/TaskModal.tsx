@@ -57,7 +57,7 @@ const priorities = [
 
 const formSchema = yup
   .object({
-    title: yup.string().min(5).max(200).required(),
+    title: yup.string().min(5).max(200).trim().required(),
     description: yup.string().optional(),
     priority: yup
       .string<TaskPriority>()
@@ -110,7 +110,7 @@ export function TaskModal({ task, open, setOpen }: Props) {
   }
   async function onSubmit(data: yup.InferType<typeof formSchema>) {
     const newTask: CreateTaskDto = {
-      title: data.title,
+      title: data.title.trim(),
       description: data.description,
       priority: data.priority,
       dueDate: data.dueDate ? formatISO(data.dueDate) : undefined,
