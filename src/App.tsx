@@ -8,8 +8,8 @@ import { TaskFilters, type Filters } from '@/features/tasks/TaskFilters';
 import { useGetTasksQuery } from '@/features/tasks/taskService';
 import { toast } from 'react-toastify';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Pagination } from '@/components/Pagination';
-import { TaskSkeleton } from '@/features/tasks/TaskSkeleton';
+import { Pagination } from '@/components/Pagination/index';
+import { TasksSkeletons } from '@/features/tasks/TaskSkeleton';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 
@@ -94,8 +94,7 @@ function App() {
             No tasks {debouncedSearch.length > 0 && 'like this'} (๑˃̵ᴗ˂̵)/
           </h3>
         )}
-        {isLoading &&
-          Array.from({ length: 3 }).map((_, i) => <TaskSkeleton key={i} />)}
+        {isLoading && <TasksSkeletons />}
         {data?.data.map((item) => (
           <Task key={item.id} task={item} selectTask={handleSelectTask} />
         ))}

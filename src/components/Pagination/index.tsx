@@ -7,61 +7,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+  usePagination,
+  type Arguments as PaginationArguments,
+} from './usePagination';
 
-function getPaginationRange(current: number, totalPages: number) {
-  const range: (number | 'elipse')[] = [];
-  const delta = 2;
+type Props = PaginationArguments;
 
-  const left = Math.max(2, current - delta);
-  const right = Math.min(totalPages - 1, current + delta);
-
-  // Show first page
-  range.push(1);
-
-  if (left > 2) {
-    range.push('elipse');
-  }
-
-  for (let i = left; i <= right; i++) {
-    range.push(i);
-  }
-
-  if (right < totalPages - 1) {
-    range.push('elipse');
-  }
-
-  // Show last page
-  if (totalPages > 1) {
-    range.push(totalPages);
-  }
-
-  return range;
-}
-
-type Props = {
-  limit: number;
-  page: number;
-  total: number;
-  setPage: (page: number) => void;
-};
-
-export function Pagination({ limit, page, total, setPage }: Props) {
-  const totalPages = Math.ceil(total / limit);
-
-  function handlePrevious() {
-    if (page === 1) return;
-    setPage(Math.max(page - 1, 1));
-  }
-  function handleNext() {
-    if (page === totalPages) return;
-    setPage(Math.min(page + 1, totalPages));
-  }
-
-  function handleSetPage(newPage: number) {
-    if (page === newPage) return;
-    setPage(newPage);
-  }
-  const range = getPaginationRange(page, totalPages);
+export function Pagination({ page, limit, setPage, total }: Props) {
+  const { handleNext, handlePrevious, handleSetPage, range, totalPages } =
+    usePagination({ limit, page, setPage, total });
 
   return (
     <PaginationRoot>
