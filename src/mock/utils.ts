@@ -1,11 +1,11 @@
 import { MOCK_CONFIG } from './config';
-
-import { type Task } from '@/features/tasks/types';
+import { type Task, type TaskPriority } from '@/features/tasks/types';
 import type {
   ApiErrorResponse,
   CompletionFilter,
   SortBy,
 } from '@/features/tasks/taskService';
+import * as yup from 'yup';
 
 const TASKS_KEY = 'tasks';
 
@@ -23,8 +23,8 @@ export const delay = () =>
     setTimeout(
       res,
       Math.random() * (MOCK_CONFIG.maxDelay - MOCK_CONFIG.minDelay) +
-        MOCK_CONFIG.minDelay
-    )
+        MOCK_CONFIG.minDelay,
+    ),
   );
 
 export function maybeThrowError() {
@@ -35,7 +35,7 @@ export function maybeThrowError() {
       data: createApiError(
         statusCode,
         statusCode === 400 ? 'Bad Request' : 'Internal Server Error',
-        'Simulated network failure'
+        'Simulated network failure',
       ),
     };
   }
@@ -44,7 +44,7 @@ export function maybeThrowError() {
 export function createApiError(
   statusCode: number,
   error: string,
-  message: string | string[]
+  message: string | string[],
 ): ApiErrorResponse {
   return {
     statusCode,
@@ -53,10 +53,43 @@ export function createApiError(
   };
 }
 
+const taskPriority: TaskPriority[] = ['low', 'medium', 'high'];
+
+export const createTaskSchema = yup.object({
+  title: yup
+    .string()
+    .trim()
+    .min(3, 'Title must be at least 3 characters')
+    .required('Title is required'),
+
+  description: yup.string().trim().optional(),
+
+  priority: yup
+    .mixed<TaskPriority>()
+    .oneOf(taskPriority, 'Invalid priority')
+    .required('Priority is required'),
+
+  dueDate: yup
+    .string()
+    .optional()
+    .test('is-date', 'Due date must be a valid ISO date', (value) => {
+      if (!value) return true;
+      return !Number.isNaN(Date.parse(value));
+    }),
+});
+
+export function formatYupError(err: yup.ValidationError): ApiErrorResponse {
+  return {
+    error: 'ValidationError',
+    message: err.errors,
+    statusCode: 422,
+  };
+}
+
 export function filterTasks(
   tasks: Task[],
   filter: CompletionFilter,
-  search: string
+  search: string,
 ) {
   return tasks.filter((t) => {
     if (filter === 'active' && t.completed) return false;
@@ -72,7 +105,7 @@ export function sortTasks(tasks: Task[], sortBy: SortBy) {
     case 'date': {
       return [...tasks].sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
     case 'priority': {

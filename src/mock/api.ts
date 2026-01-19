@@ -7,6 +7,8 @@ import {
   loadTasks,
   saveTasks,
   createApiError,
+  formatYupError,
+  createTaskSchema,
 } from './utils';
 import { type Task } from '@/features/tasks/types';
 import { nanoid } from '@reduxjs/toolkit';
@@ -16,6 +18,7 @@ import type {
   CompletionFilter,
   SortBy,
 } from '@/features/tasks/taskService';
+import * as yup from 'yup';
 
 export type MockedBaseQuertArgs = {
   url: string;
@@ -71,16 +74,39 @@ export const mockedBaseQuery: BaseQueryFn<
 
     // POST /api/tasks
     if (url === '/tasks' && method === 'POST') {
-      //FIXME: Validation
-      //@ts-expect-error i will deal with this later
-      const task: Task = {
-        id: nanoid(),
-        completed: false,
-        createdAt: new Date().toISOString(),
-        ...body,
-      };
-      saveTasks([task, ...tasks]);
-      return { data: { data: task } };
+      try {
+        const validatedBody = await createTaskSchema.validate(body, {
+          abortEarly: false,
+          stripUnknown: true,
+        });
+
+        const task: Task = {
+          id: nanoid(),
+          completed: false,
+          createdAt: new Date().toISOString(),
+          ...validatedBody,
+        };
+
+        saveTasks([task, ...tasks]);
+
+        return {
+          data: { data: task },
+        };
+      } catch (err) {
+        if (err instanceof yup.ValidationError) {
+          return {
+            error: formatYupError(err),
+          };
+        }
+
+        return {
+          error: {
+            error: 'InternalServerError',
+            message: 'Something went wrong',
+            statusCode: 500,
+          },
+        };
+      }
     }
 
     // PUT /api/tasks/:id
@@ -109,7 +135,6 @@ export const mockedBaseQuery: BaseQueryFn<
       return { data: { data: null } };
     }
   } catch (err) {
-    // FIXME: redundant ?
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const error = err as any;
     if (error?.status && error?.data) {
