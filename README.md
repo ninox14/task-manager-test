@@ -1,73 +1,129 @@
-# React + TypeScript + Vite
+# TOdo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Task manager test application
 
-Currently, two official plugins are available:
+## Technology Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Vite** - Next-generation frontend build tool for fast development
+- **React + TypeScript** - Component-based UI library with type safety
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **shadcn/ui** - Re-usable component library built on Radix UI primitives
+- **Redux Toolkit (RTK) + RTK Query** - State management and data fetching
+- **React Hook Form + Yup** - Form handling with validation schemas
+- **date-fns** - Modern date utility library
+- **React Day Picker** - Accessible date picker component
+- **Lucide React** - Beautiful & consistent icon library
 
-## React Compiler
+## Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Clone the repository:
 
-## Expanding the ESLint configuration
+   ```bash
+   git clone <repository-url>
+   cd task-manager-test
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Install dependencies:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. Set up environment variables (if needed):
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## How to Run the Project
+
+### Development Mode
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Build for Production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+# or
+yarn build
+# or
+pnpm build
 ```
+
+### Preview Production Build
+
+```bash
+npm run preview
+# or
+yarn preview
+# or
+pnpm preview
+```
+
+### Lint Code
+
+```bash
+npm run lint
+# or
+yarn lint
+# or
+pnpm lint
+```
+
+## Project Structure
+
+```
+📁 Source Files (33):
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx             # Root application component
+│   ├── index.css           # Global CSS styles
+│   ├── store.ts            # Main Redux store configuration
+│   ├── lib/
+│   │   └── utils.ts        # Global utility functions
+│   ├── hooks/
+│   │   └── useDebounce.ts  # Custom hook for debouncing
+│   ├── components/
+│   │   ├── ui/             # Reusable UI components
+│   │   │   ├── button.tsx
+│   │   |   ├── ...
+│   │   └── Pagination/     # Reusable omponents which contain business logic
+│   │       ├── index.tsx
+│   │       └── usePagination.tsx
+│   ├── features/
+│   │   └── tasks/          # Task management feature
+│   │       ├── Task.tsx           # Task list item component
+│   │       ├── TaskFilters.tsx    # Task filtering component
+│   │       ├── TaskModal.tsx      # Create/Edit task modal
+│   │       ├── taskService.ts     # API service layer
+│   │       ├── TaskSkeleton.tsx   # Loading skeleton
+│   │       └── types.ts           # TypeScript types
+│   └── mock/               # Mock data and API
+│       ├── api.ts
+│       ├── config.ts
+│       └── utils.ts
+```
+
+### Structure Decisions
+
+- **Feature-based Organization**: The `features/tasks/` directory contains all task-related logic, promoting modularity and separation of concerns
+- **Component Library**: Reusable UI components are in `components/ui/` following shadcn/ui conventions. `components/` directory contains global reusable components which contain some logic and built using components from `components/ui/`
+- **Custom Hooks**: Shared logic extracted into reusable hooks in `hooks/`
+- **Mocks**: `mock/`Contains mocked backend
+
+## Development Decisions
+
+- **Code style and separation**: Some parts of the code could be further decomposed / abstracted, but they are not, due to the small scale of the project. The `components/Pagination` component is an example of how it could look.

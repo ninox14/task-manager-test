@@ -258,6 +258,7 @@ export function TaskModal({ task, open, setOpen }: Props) {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
+                        id="due-date"
                         variant="outline"
                         data-empty={!field.value}
                         className="data-[empty=true]:text-muted-foreground w-70 justify-start text-left font-normal"
@@ -273,7 +274,7 @@ export function TaskModal({ task, open, setOpen }: Props) {
                     <PopoverContent className="w-auto p-0">
                       <Calendar
                         mode="single"
-                        id="due-date"
+                        id="due-date-calendar"
                         selected={field.value}
                         disabled={{ before: new Date() }}
                         onSelect={(e) => {
