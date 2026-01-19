@@ -119,8 +119,8 @@ pnpm lint
 
 ### Structure Decisions
 
-- **Feature-based Organization**: The `features/tasks/` directory contains all task-related logic, promoting modularity and separation of concerns
-- **Component Library**: Reusable UI components are in `components/ui/` following shadcn/ui conventions. `components/` directory contains global reusable components which contain some logic and built using components from `components/ui/`
+- **Feature-based Organization**: The `features/*` directory contains components with logic separated by features that could be nested to achieve more separation/decomposition, promoting modularity and separation of concerns
+- **Component Library**: Reusable UI components are in `components/ui/` following shadcn/ui conventions. `components/*` directory contains global reusable components which contain some logic and built using components from `components/ui/`
 - **Custom Hooks**: Shared logic extracted into reusable hooks in `hooks/`
 - **Mocks**: `mock/`Contains mocked backend
 
