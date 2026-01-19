@@ -127,3 +127,7 @@ pnpm lint
 ## Development Decisions
 
 - **Code style and separation**: Some parts of the code could be further decomposed / abstracted, but they are not, due to the small scale of the project. The `components/Pagination` component is an example of how it could look.
+
+## Other
+
+You can use this [Paste.sh](https://paste.sh/Z6jtKH53#gMcZDfZuYQX-cD8a9GaNCsJx) with generated tasks to test pagination. Put it as value into only key in local storage `tasks`.
