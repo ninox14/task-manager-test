@@ -56,7 +56,6 @@ export const mockedBaseQuery: BaseQueryFn<
         filterTasks(tasks, completion, search),
         sortBy,
       );
-      // const relevantPage = search.length > 0
       const start = (page - 1) * limit;
       const paged = filtered.slice(start, start + limit);
 
@@ -124,7 +123,7 @@ export const mockedBaseQuery: BaseQueryFn<
         t.id === id ? { ...t, completed: !t.completed } : t,
       );
       saveTasks(tasks);
-      console.log('Patched successfully', id);
+
       return { data: { data: tasks.find((t) => t.id === id)! } };
     }
 
