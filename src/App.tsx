@@ -24,7 +24,7 @@ function App() {
     sortBy: 'date',
   });
   const [page, setPage] = useState(1);
-  const debouncedSearch = useDebounce(filters.search, 500);
+  const debouncedSearch = useDebounce(filters.search.trim(), 500);
   const { data, isLoading, isFetching, error, isError, refetch } =
     useGetTasksQuery(
       {
