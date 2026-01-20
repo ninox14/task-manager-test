@@ -20,12 +20,17 @@ export type Filters = {
 type Props = {
   filters: Filters;
   setFilters: (filters: Filters) => void;
+  setPage: (page: number) => void;
+  page: number;
 };
-export function TaskFilters({ filters, setFilters }: Props) {
+export function TaskFilters({ filters, setFilters, setPage, page }: Props) {
   function handleCompletionChange(completion: CompletionFilter) {
     setFilters({ ...filters, completion });
   }
   function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.value.trim().length > 2 && page !== 1) {
+      setPage(1);
+    }
     setFilters({ ...filters, search: e.target.value });
   }
   function handleSortChange(sortBy: SortBy) {
