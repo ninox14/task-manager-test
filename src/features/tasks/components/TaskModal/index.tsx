@@ -12,7 +12,7 @@ import {
 import { CreateTaskForm } from './TaskCreateForm';
 import { UpdateTaskForm } from './TaskUpdateForm';
 type TaskModalProps = {
-  task?: Task;
+  task: Task | null;
   open: boolean;
   setOpen: (open: boolean) => void;
 };
