@@ -129,11 +129,9 @@ export function TaskModal({ task, open, setOpen }: Props) {
         error: FetchBaseQueryError;
         data?: ApiErrorResponse;
       };
-      let msg;
-      if (error?.data) {
-        msg = error.data?.message;
-      }
-      toast.error(`Error while submitting task${msg ? `: ${msg}` : ''}`);
+      toast.error(
+        `Error while submitting task${error?.data?.message ? `: ${error.data.message}` : ''}`,
+      );
     }
   }
   useEffect(() => {

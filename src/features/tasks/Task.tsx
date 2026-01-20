@@ -12,10 +12,15 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+const TOAST_SUCCESS_DELAY = 2000;
+
 type Props = { task: Task; selectTask: (task: Task) => void };
 
+function formatISODate(date: string) {
+  return format(parseJSON(date), 'dd-MM-yyyy');
+}
+
 export function Task({ task, selectTask }: Props) {
-  const createdAt = format(parseJSON(task.createdAt), 'dd-MM-yyyy');
   const [toggleTask, { isLoading: isUpdating }] = useToggleTaskMutation();
 
   const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
@@ -24,7 +29,7 @@ export function Task({ task, selectTask }: Props) {
     try {
       await toggleTask(task.id).unwrap();
       toast.success('Successfully Updated task', {
-        autoClose: 2000,
+        autoClose: TOAST_SUCCESS_DELAY,
       });
     } catch {
       toast.error('Something went wrong while toggling task');
@@ -34,12 +39,14 @@ export function Task({ task, selectTask }: Props) {
   async function handleDeleteTask() {
     try {
       await deleteTask(task.id).unwrap();
-      toast.success('Successfully Deleted task', { autoClose: 2000 });
+      toast.success('Successfully Deleted task', {
+        autoClose: TOAST_SUCCESS_DELAY,
+      });
     } catch {
       toast.error('Something went wrong while deleting task');
     }
   }
-
+  const createdAt = formatISODate(task.createdAt);
   const isLoading = isUpdating || isDeleting;
 
   return (
@@ -81,7 +88,7 @@ export function Task({ task, selectTask }: Props) {
       {task?.dueDate && (
         <div>
           <h6 className="font-bold inline-flex">Due Date:</h6>{' '}
-          {format(parseJSON(task.dueDate), 'dd-MM-yyyy')}
+          {formatISODate(task.dueDate)}
         </div>
       )}
       {isLoading && (
