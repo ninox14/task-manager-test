@@ -31,8 +31,6 @@ const staggeredBaseQueryWithBailOut = retry(
   async (args: MockedBaseQuertArgs, api, extraOptions) => {
     const result = await mockedBaseQuery(args, api, extraOptions);
 
-    // bail out of re-tries immediately if unauthorized,
-    // because we know successive re-retries would be redundant
     if (result.error?.statusCode === 400) {
       retry.fail(result.error, result.meta);
     }

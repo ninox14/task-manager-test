@@ -5,7 +5,6 @@ function getPaginationRange(current: number, totalPages: number) {
   const left = Math.max(2, current - delta);
   const right = Math.min(totalPages - 1, current + delta);
 
-  // Show first page
   range.push(1);
 
   if (left > 2) {
@@ -20,7 +19,6 @@ function getPaginationRange(current: number, totalPages: number) {
     range.push('elipse');
   }
 
-  // Show last page
   if (totalPages > 1) {
     range.push(totalPages);
   }

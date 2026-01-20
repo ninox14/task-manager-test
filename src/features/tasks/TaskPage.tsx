@@ -37,7 +37,6 @@ export function TaskPage() {
       },
     );
   function handleTaskModalOpen(open: boolean) {
-    // Deselect task when edit modal closes
     if (!open && task) {
       setTask(undefined);
     }
