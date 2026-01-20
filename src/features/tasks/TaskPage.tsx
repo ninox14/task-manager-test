@@ -6,12 +6,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { Pagination } from '@/components/Pagination/index';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
-import { Task } from './Task';
-import { TaskModal } from './TaskModal';
+import { Task } from './components/Task';
+import { TaskModal } from './components/TaskModal';
 import type { Task as TaskType } from './types';
-import { TaskFilters, type Filters } from './TaskFilters';
+import { TaskFilters, type Filters } from './components/TaskFilters';
 import { useGetTasksQuery } from './taskService';
-import { TasksSkeletons } from './TaskSkeleton';
+import { TasksSkeletons } from './components/TaskSkeleton';
 
 const MAX_ITEMS_PER_PAGE = 10;
 

@@ -1,6 +1,5 @@
 import type { ChangeEvent } from 'react';
 import { Input } from '@/components/ui/input';
-import type { CompletionFilter, SortBy } from './taskService';
 import {
   Select,
   SelectContent,
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { CompletionFilter, SortBy } from '../taskService';
 
 export type Filters = {
   completion: CompletionFilter;
